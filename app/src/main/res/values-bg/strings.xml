@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Касов Бон</string>
+    <string name="action_sign_in">Вход</string>
+    <string name="action_sign_in_short">Вход</string>
+    <string name="date">Дата</string>
+    <string name="error_common">Няма връзка с https://kasovbon.bg</string>
+    <string name="error_field_required">Задължително поле</string>
+    <string name="error_incorrect_password">Грешен имейл или парола</string>
+    <string name="error_invalid_email">Невалиден имейл</string>
+    <string name="error_invalid_password">Паролата е прекалено къса</string>
+    <string name="logout">Изход</string>
+    <string name="price">Цена</string>
+    <string name="prompt_email">Имейл</string>
+    <string name="prompt_password">Парола</string>
+    <string name="registered_month">За месечна награда: %1$s</string>
+    <string name="registered_text">Регистрирани касови бележки</string>
+    <string name="registered_week">За седмична награда: %1$s</string>
+    <string name="registered_year">За годишна награда: %1$s</string>
+    <string name="remember_me">Запомни ме</string>
+    <string name="send">Изпрати</string>
+    <string name="send_fail">Касовата бележка не беше регистрирана. Няма връзка с https://kasovbon.bg</string>
+    <string name="send_success">Успешно регистрирана бележка.</string>
+    <string name="time">Час</string>
+    <string name="pos_time">ПОС час</string>
+    <string name="title_activity_login">Вход</string>
+    <string name="attention">Внимание</string>
+    <string name="empty_field">Има празно поле</string>
+    <string name="pos_terminal">ПОС терминал</string>
+    <string name="error">Грешка</string>
+    <string name="register_link"><Data><![CDATA[Ако нямате регистрация, моля регистрирайте се <a href=\"https://kasovbon.bg/\">тук</a>.]]> </Data></string>
+
+    <!--Common-->
+    <string name="please_wait_message">Моля, изчакайте!</string>
+</resources>

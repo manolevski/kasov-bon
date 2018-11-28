@@ -1,0 +1,38 @@
+<resources>
+    <string name="app_name">Kasov Bon</string>
+    <string name="title_activity_login">Log in</string>
+
+    <!-- Strings related to login -->
+    <string name="prompt_email">Email</string>
+    <string name="prompt_password">Password</string>
+    <string name="action_sign_in">Log in</string>
+    <string name="action_sign_in_short">Log in</string>
+    <string name="remember_me">Remember me</string>
+    <string name="error_invalid_email">This email address is invalid</string>
+    <string name="error_invalid_password">This password is too short</string>
+    <string name="error_incorrect_password">Email or password is incorrect</string>
+    <string name="error_common">No connection with https://kasovbon.bg</string>
+    <string name="error_field_required">Required field</string>
+    <string name="register_link"><Data><![CDATA[If you don\'t have a registration, please register <a href=\"https://kasovbon.bg/\">here</a>.]]> </Data></string>
+
+    <!--Main -->
+    <string name="logout">Logout</string>
+    <string name="date">Date</string>
+    <string name="time">Time</string>
+    <string name="pos_time">POS Time</string>
+    <string name="price">Price</string>
+    <string name="send">Send</string>
+    <string name="send_success">Receipt registered.</string>
+    <string name="send_fail">Receipt not registered. No connection with https://kasovbon.bg</string>
+    <string name="registered_text">Registered receipts</string>
+    <string name="registered_week">For weekly prize: %1$s</string>
+    <string name="registered_month">For monthly prize: %1$s</string>
+    <string name="registered_year">For annual prize: %1$s</string>
+    <string name="attention">Attention</string>
+    <string name="error">Error</string>
+    <string name="empty_field">There is empty field</string>
+    <string name="pos_terminal">POS terminal</string>
+
+    <!--Common-->
+    <string name="please_wait_message">Please wait!</string>
+</resources>
