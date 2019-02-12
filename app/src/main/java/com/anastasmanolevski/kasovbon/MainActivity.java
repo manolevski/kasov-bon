@@ -1,6 +1,8 @@
 package com.anastasmanolevski.kasovbon;
 
+import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
+import android.app.TimePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -14,8 +16,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.anastasmanolevski.kasovbon.AsyncTasks.GetDataTask;
@@ -27,9 +31,7 @@ import com.anastasmanolevski.kasovbon.AsyncTasks.UserLoginTask;
 import com.anastasmanolevski.kasovbon.Listeners.ErrorDialogClickListener;
 import com.anastasmanolevski.kasovbon.Managers.DialogManager;
 import com.anastasmanolevski.kasovbon.Utils.Constants;
-import com.anastasmanolevski.kasovbon.Utils.DatePickerFragment;
 import com.anastasmanolevski.kasovbon.Managers.SharedPreferencesManager;
-import com.anastasmanolevski.kasovbon.Utils.TimePickerFragment;
 import com.anastasmanolevski.kasovbon.Utils.User;
 
 import org.jsoup.nodes.Document;
@@ -37,7 +39,12 @@ import org.jsoup.nodes.Element;
 import org.jsoup.parser.Parser;
 import org.jsoup.select.Elements;
 
-public class MainActivity extends AppCompatActivity {
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
+
+public class MainActivity extends AppCompatActivity implements DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener {
 
 
     private EditText dateEdit;
@@ -64,6 +71,8 @@ public class MainActivity extends AppCompatActivity {
     private GetDataListener getDataListener;
     private LoginListener loginListener;
 
+    private Calendar calendar;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -87,6 +96,8 @@ public class MainActivity extends AppCompatActivity {
                 getDataTask.execute((Void) null);
             }
         }
+
+        calendar = Calendar.getInstance();
     }
 
     @Override
@@ -230,14 +241,21 @@ public class MainActivity extends AppCompatActivity {
 
     public void showDatePickerDialog() {
         dateEdit.setError(null);
-        DatePickerFragment newFragment = new DatePickerFragment();
-        newFragment.show(getSupportFragmentManager(), "datePicker");
+
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH);
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+
+        DialogManager.datePickerDialog(this, year, month, day, this);
     }
 
     public void showTimePickerDialog() {
         timeEdit.setError(null);
-        TimePickerFragment newFragment = new TimePickerFragment();
-        newFragment.show(getSupportFragmentManager(), "timePicker");
+
+        int hour = calendar.get(Calendar.HOUR_OF_DAY);
+        int minute = calendar.get(Calendar.MINUTE);
+
+        DialogManager.timePickerDialog(this, hour, minute, this);
     }
 
     public void sendData(View v) {
@@ -361,5 +379,24 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(this, LoginActivity.class);
         startActivity(intent);
         finish();
+    }
+
+    @Override
+    public void onDateSet(DatePicker datePicker, int selectedYear, int selectedMonth, int selectedDay) {
+        calendar.set(Calendar.YEAR, selectedYear);
+        calendar.set(Calendar.MONTH, selectedMonth);
+        calendar.set(Calendar.DAY_OF_MONTH, selectedDay);
+        Date selectedDate = calendar.getTime();
+        SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy", Locale.GERMANY);
+        dateEdit.setText(sdf.format(selectedDate));
+    }
+
+    @Override
+    public void onTimeSet(TimePicker timePicker, int selectedHour, int selectedMinute) {
+        calendar.set(Calendar.HOUR_OF_DAY, selectedHour);
+        calendar.set(Calendar.MINUTE, selectedMinute);
+        Date selectedTime = calendar.getTime();
+        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm", Locale.GERMANY);
+        timeEdit.setText(sdf.format(selectedTime));
     }
 }
