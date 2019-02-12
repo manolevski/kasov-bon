@@ -1,4 +1,4 @@
-package com.anastasmanolevski.kasovbon.Managers;
+package com.manolevski.kasovbon.Managers;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -8,7 +8,7 @@ import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 
-import com.anastasmanolevski.kasovbon.Listeners.ErrorDialogClickListener;
+import com.manolevski.kasovbon.Listeners.ErrorDialogClickListener;
 
 /**
  * Created by Anastas Manolevski on 27.11.2018.

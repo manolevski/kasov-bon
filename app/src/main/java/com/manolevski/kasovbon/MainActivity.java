@@ -1,4 +1,4 @@
-package com.anastasmanolevski.kasovbon;
+package com.manolevski.kasovbon;
 
 import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
@@ -21,17 +21,17 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
-import com.anastasmanolevski.kasovbon.AsyncTasks.GetDataTask;
-import com.anastasmanolevski.kasovbon.Listeners.GetDataListener;
-import com.anastasmanolevski.kasovbon.Listeners.LoginListener;
-import com.anastasmanolevski.kasovbon.Listeners.SendDataListener;
-import com.anastasmanolevski.kasovbon.AsyncTasks.SendDataTask;
-import com.anastasmanolevski.kasovbon.AsyncTasks.UserLoginTask;
-import com.anastasmanolevski.kasovbon.Listeners.ErrorDialogClickListener;
-import com.anastasmanolevski.kasovbon.Managers.DialogManager;
-import com.anastasmanolevski.kasovbon.Utils.Constants;
-import com.anastasmanolevski.kasovbon.Managers.SharedPreferencesManager;
-import com.anastasmanolevski.kasovbon.Utils.User;
+import com.manolevski.kasovbon.AsyncTasks.GetDataTask;
+import com.manolevski.kasovbon.Listeners.GetDataListener;
+import com.manolevski.kasovbon.Listeners.LoginListener;
+import com.manolevski.kasovbon.Listeners.SendDataListener;
+import com.manolevski.kasovbon.AsyncTasks.SendDataTask;
+import com.manolevski.kasovbon.AsyncTasks.UserLoginTask;
+import com.manolevski.kasovbon.Listeners.ErrorDialogClickListener;
+import com.manolevski.kasovbon.Managers.DialogManager;
+import com.manolevski.kasovbon.Utils.Constants;
+import com.manolevski.kasovbon.Managers.SharedPreferencesManager;
+import com.manolevski.kasovbon.Utils.User;
 import com.google.android.material.snackbar.Snackbar;
 
 import org.jsoup.nodes.Document;
