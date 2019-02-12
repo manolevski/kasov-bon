@@ -20,7 +20,6 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.TimePicker;
-import android.widget.Toast;
 
 import com.anastasmanolevski.kasovbon.AsyncTasks.GetDataTask;
 import com.anastasmanolevski.kasovbon.Listeners.GetDataListener;
@@ -33,6 +32,7 @@ import com.anastasmanolevski.kasovbon.Managers.DialogManager;
 import com.anastasmanolevski.kasovbon.Utils.Constants;
 import com.anastasmanolevski.kasovbon.Managers.SharedPreferencesManager;
 import com.anastasmanolevski.kasovbon.Utils.User;
+import com.google.android.material.snackbar.Snackbar;
 
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -162,8 +162,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                         getDataTask.execute((Void) null);
                     }
                 } else {
-                    Toast toast = Toast.makeText(getApplicationContext(), R.string.send_fail, Toast.LENGTH_SHORT);
-                    toast.show();
+                    Snackbar.make(findViewById(android.R.id.content), R.string.send_fail, Snackbar.LENGTH_LONG).show();
                 }
             }
 
@@ -204,12 +203,8 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                         getDataTask = new GetDataTask(cookie, getDataListener);
                         getDataTask.execute((Void) null);
                     }
-                } else if (result.equals("error")) {
-                    Toast toast = Toast.makeText(getApplicationContext(), R.string.error_common, Toast.LENGTH_SHORT);
-                    toast.show();
                 } else {
-                    Toast toast = Toast.makeText(getApplicationContext(), R.string.error_common, Toast.LENGTH_SHORT);
-                    toast.show();
+                    Snackbar.make(findViewById(android.R.id.content), R.string.error_common, Snackbar.LENGTH_LONG).show();
                 }
             }
 
@@ -360,8 +355,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
             timeEdit.setText("");
             timePosEdit.setText("");
             posCheckBox.setChecked(false);
-            Toast toast = Toast.makeText(getApplicationContext(), success.first().html().replaceAll("<br />", ""), Toast.LENGTH_SHORT);
-            toast.show();
+            Snackbar.make(findViewById(android.R.id.content), success.first().html().replaceAll("<br />", ""), Snackbar.LENGTH_LONG).show();
         }
     }
 

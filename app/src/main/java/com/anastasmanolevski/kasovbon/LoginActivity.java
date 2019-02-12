@@ -17,7 +17,6 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.anastasmanolevski.kasovbon.Listeners.LoginListener;
 import com.anastasmanolevski.kasovbon.AsyncTasks.UserLoginTask;
@@ -25,6 +24,7 @@ import com.anastasmanolevski.kasovbon.Listeners.ErrorDialogClickListener;
 import com.anastasmanolevski.kasovbon.Managers.DialogManager;
 import com.anastasmanolevski.kasovbon.Managers.SharedPreferencesManager;
 import com.anastasmanolevski.kasovbon.Utils.User;
+import com.google.android.material.snackbar.Snackbar;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -141,8 +141,7 @@ public class LoginActivity extends AppCompatActivity {
                     });
                 }
                 else {
-                    Toast toast = Toast.makeText(getApplicationContext(), getString(R.string.error_common), Toast.LENGTH_SHORT);
-                    toast.show();
+                    Snackbar.make(findViewById(android.R.id.content), R.string.error_common, Snackbar.LENGTH_LONG).show();
                 }
             }
 
