@@ -1,11 +1,14 @@
-package com.anastasmanolevski.kasovbon.Managers;
+package com.manolevski.kasovbon.Managers;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
+import android.app.TimePickerDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 
-import com.anastasmanolevski.kasovbon.Listeners.ErrorDialogClickListener;
+import com.manolevski.kasovbon.Listeners.ErrorDialogClickListener;
 
 /**
  * Created by Anastas Manolevski on 27.11.2018.
@@ -30,5 +33,15 @@ public class DialogManager {
                     }
                 });
         alertDialog.show();
+    }
+
+    public static void datePickerDialog(Context context, int year, int month, int day, DatePickerDialog.OnDateSetListener listener) {
+        DatePickerDialog datePicker = new DatePickerDialog(context, listener, year, month, day);
+        datePicker.show();
+    }
+
+    public static void timePickerDialog(Context context, int hour, int minute, TimePickerDialog.OnTimeSetListener listener) {
+        TimePickerDialog timePicker = new TimePickerDialog(context, listener, hour, minute, true);
+        timePicker.show();
     }
 }

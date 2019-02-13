@@ -1,13 +1,13 @@
-package com.anastasmanolevski.kasovbon.Managers;
+package com.manolevski.kasovbon.Managers;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import com.anastasmanolevski.kasovbon.Utils.User;
+import com.manolevski.kasovbon.Utils.User;
 
 public class SharedPreferencesManager {
 
-    private static final String SHARED_PREFERENCES_NAME = "com.anastasmanolevski.kasovbon.preferences";
+    private static final String SHARED_PREFERENCES_NAME = "com.manolevski.kasovbon.preferences";
     private static final String KEY_USER_NAME = "userName";
     private static final String KEY_PASSWORD = "password";
     private static final String KEY_REMEMBER_ME = "rememberMe";

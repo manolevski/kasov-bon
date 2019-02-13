@@ -1,4 +1,4 @@
-package com.anastasmanolevski.kasovbon.Utils;
+package com.manolevski.kasovbon.Utils;
 
 /**
  * Created by Anastas Manolevski on 26.11.2018.

@@ -4,11 +4,11 @@ android {
     compileSdkVersion 28
     buildToolsVersion '28.0.3'
     defaultConfig {
-        applicationId 'com.anastasmanolevski.kasovbon'
+        applicationId 'com.manolevski.kasovbon'
         minSdkVersion 19
         targetSdkVersion 28
-        versionCode 5
-        versionName '1.4'
+        versionCode 1
+        versionName '1.0'
     }
     buildTypes {
         release {
@@ -23,7 +23,7 @@ android {
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'androidx.appcompat:appcompat:1.0.2'
-    implementation 'com.google.android.material:material:1.1.0-alpha01'
+    implementation 'com.google.android.material:material:1.1.0-alpha03'
     implementation 'cz.msebera.android:httpclient:4.4.1.1'
     implementation 'org.jsoup:jsoup:1.7.3'
 }

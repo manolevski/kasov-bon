@@ -1,4 +1,4 @@
-package com.anastasmanolevski.kasovbon.Listeners;
+package com.manolevski.kasovbon.Listeners;
 
 public interface LoginListener {
     void onCompleted(String result);

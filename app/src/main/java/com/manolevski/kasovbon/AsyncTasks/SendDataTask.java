@@ -1,9 +1,9 @@
-package com.anastasmanolevski.kasovbon.AsyncTasks;
+package com.manolevski.kasovbon.AsyncTasks;
 
 import android.os.AsyncTask;
 
-import com.anastasmanolevski.kasovbon.Listeners.SendDataListener;
-import com.anastasmanolevski.kasovbon.Utils.Constants;
+import com.manolevski.kasovbon.Listeners.SendDataListener;
+import com.manolevski.kasovbon.Utils.Constants;
 
 import java.io.IOException;
 import java.util.ArrayList;
