@@ -8,9 +8,9 @@ import com.manolevski.kasovbon.Utils.Constants;
 import java.io.IOException;
 
 import cz.msebera.android.httpclient.HttpResponse;
-import cz.msebera.android.httpclient.client.HttpClient;
 import cz.msebera.android.httpclient.client.methods.HttpGet;
-import cz.msebera.android.httpclient.impl.client.DefaultHttpClient;
+import cz.msebera.android.httpclient.impl.client.CloseableHttpClient;
+import cz.msebera.android.httpclient.impl.client.HttpClientBuilder;
 import cz.msebera.android.httpclient.util.EntityUtils;
 
 public class GetDataTask extends AsyncTask<Void, Void, String> {
@@ -25,16 +25,17 @@ public class GetDataTask extends AsyncTask<Void, Void, String> {
 
     @Override
     protected String doInBackground(Void... params) {
-        HttpClient httpclient = new DefaultHttpClient();
         HttpGet httpget = new HttpGet(Constants.BASE_URL);
         httpget.setHeader("Cookie", "RAICHUADMSESSID="+mCookie);
         String responseString;
-        try {
-            HttpResponse response = httpclient.execute(httpget);
+
+        try (CloseableHttpClient httpClient = HttpClientBuilder.create().build()) {
+            HttpResponse response = httpClient.execute(httpget);
             responseString = EntityUtils.toString(response.getEntity(), "UTF-8");
         } catch (IOException e) {
             return "";
         }
+
         return responseString;
     }
 

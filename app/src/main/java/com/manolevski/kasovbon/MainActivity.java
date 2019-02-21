@@ -352,6 +352,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         Elements success = doc.select("div.alert-success");
         if (success.size() > 0 && !success.first().html().equals("")) {
             priceEdit.setText("");
+            priceEdit.requestFocus();
             timeEdit.setText("");
             timePosEdit.setText("");
             posCheckBox.setChecked(false);

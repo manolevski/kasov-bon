@@ -6,6 +6,7 @@ import com.manolevski.kasovbon.Listeners.LoginListener;
 import com.manolevski.kasovbon.Utils.Constants;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,10 +14,10 @@ import cz.msebera.android.httpclient.Header;
 import cz.msebera.android.httpclient.HeaderElement;
 import cz.msebera.android.httpclient.HttpResponse;
 import cz.msebera.android.httpclient.NameValuePair;
-import cz.msebera.android.httpclient.client.HttpClient;
 import cz.msebera.android.httpclient.client.entity.UrlEncodedFormEntity;
 import cz.msebera.android.httpclient.client.methods.HttpPost;
-import cz.msebera.android.httpclient.impl.client.DefaultHttpClient;
+import cz.msebera.android.httpclient.impl.client.CloseableHttpClient;
+import cz.msebera.android.httpclient.impl.client.HttpClientBuilder;
 import cz.msebera.android.httpclient.message.BasicNameValuePair;
 
 public class UserLoginTask extends AsyncTask<Void, Void, String> {
@@ -33,18 +34,25 @@ public class UserLoginTask extends AsyncTask<Void, Void, String> {
 
     @Override
     protected String doInBackground(Void... params) {
-        HttpClient httpclient = new DefaultHttpClient();
         HttpPost httppost = new HttpPost(Constants.LOGIN_URL);
         HttpResponse response;
+
+        List<NameValuePair> nameValuePairs = new ArrayList<>(2);
+        nameValuePairs.add(new BasicNameValuePair("username", mEmail));
+        nameValuePairs.add(new BasicNameValuePair("password", mPassword));
+
         try {
-            List<NameValuePair> nameValuePairs = new ArrayList<>(2);
-            nameValuePairs.add(new BasicNameValuePair("username", mEmail));
-            nameValuePairs.add(new BasicNameValuePair("password", mPassword));
             httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
-            response = httpclient.execute(httppost);
+        } catch (UnsupportedEncodingException e) {
+            return "fail";
+        }
+
+        try (CloseableHttpClient httpClient = HttpClientBuilder.create().build()) {
+            response = httpClient.execute(httppost);
         } catch (IOException e) {
             return "fail";
         }
+
         if(response == null) return "fail";
         Header location = response.getFirstHeader("Location");
         if(location == null) return "fail";
