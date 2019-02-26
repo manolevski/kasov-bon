@@ -2,7 +2,7 @@ package com.manolevski.kasovbon.AsyncTasks;
 
 import android.os.AsyncTask;
 
-import com.manolevski.kasovbon.Listeners.LoginListener;
+import com.manolevski.kasovbon.Listeners.ResponseListener;
 import com.manolevski.kasovbon.Utils.Constants;
 
 import java.io.IOException;
@@ -24,9 +24,9 @@ public class UserLoginTask extends AsyncTask<Void, Void, String> {
 
     private final String mEmail;
     private final String mPassword;
-    private LoginListener listener;
+    private ResponseListener listener;
 
-    public UserLoginTask(String email, String password, LoginListener listener) {
+    public UserLoginTask(String email, String password, ResponseListener listener) {
         mEmail = email;
         mPassword = password;
         this.listener = listener;

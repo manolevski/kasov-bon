@@ -2,7 +2,7 @@ package com.manolevski.kasovbon.AsyncTasks;
 
 import android.os.AsyncTask;
 
-import com.manolevski.kasovbon.Listeners.SendDataListener;
+import com.manolevski.kasovbon.Listeners.ResponseListener;
 import com.manolevski.kasovbon.Utils.Constants;
 
 import java.io.IOException;
@@ -20,14 +20,14 @@ import cz.msebera.android.httpclient.message.BasicNameValuePair;
 
 public class SendDataTask extends AsyncTask<Void, Void, Boolean> {
 
-    private SendDataListener listener;
+    private ResponseListener listener;
     private final String date;
     private final String time;
     private final String price;
     private final String posTime;
     private String cookie;
 
-    public SendDataTask(String date, String time, String price, String posTime, String cookie, SendDataListener listener) {
+    public SendDataTask(String date, String time, String price, String posTime, String cookie, ResponseListener listener) {
         this.date = date;
         this.time = time;
         this.price = price;
@@ -39,7 +39,7 @@ public class SendDataTask extends AsyncTask<Void, Void, Boolean> {
     @Override
     protected Boolean doInBackground(Void... params) {
         HttpPost httppost = new HttpPost(Constants.RECEIPT_URL);
-        httppost.setHeader("Cookie", "RAICHUADMSESSID="+ cookie);
+        httppost.setHeader("Cookie", "RAICHUADMSESSID=" + cookie);
         HttpResponse response;
         List<NameValuePair> nameValuePairs = new ArrayList<>(2);
         nameValuePairs.add(new BasicNameValuePair("bon_date", date));
@@ -69,7 +69,7 @@ public class SendDataTask extends AsyncTask<Void, Void, Boolean> {
 
     @Override
     protected void onPostExecute(final Boolean result) {
-        listener.onCompleted(result);
+        listener.onCompleted(result.toString());
     }
 
     @Override

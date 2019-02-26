@@ -22,9 +22,7 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 
 import com.manolevski.kasovbon.AsyncTasks.GetDataTask;
-import com.manolevski.kasovbon.Listeners.GetDataListener;
-import com.manolevski.kasovbon.Listeners.LoginListener;
-import com.manolevski.kasovbon.Listeners.SendDataListener;
+import com.manolevski.kasovbon.Listeners.ResponseListener;
 import com.manolevski.kasovbon.AsyncTasks.SendDataTask;
 import com.manolevski.kasovbon.AsyncTasks.UserLoginTask;
 import com.manolevski.kasovbon.Listeners.ErrorDialogClickListener;
@@ -67,9 +65,9 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
     private TextView registeredYear;
 
     private SharedPreferencesManager preferences;
-    private SendDataListener sendDataListener;
-    private GetDataListener getDataListener;
-    private LoginListener loginListener;
+    private ResponseListener sendDataListener;
+    private ResponseListener getDataListener;
+    private ResponseListener loginListener;
 
     private Calendar calendar;
 
@@ -149,13 +147,13 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
             }
         });
 
-        sendDataListener = new SendDataListener() {
+        sendDataListener = new ResponseListener() {
             @Override
-            public void onCompleted(Boolean result) {
+            public void onCompleted(String result) {
                 sendDataTask = null;
                 progressDialog.dismiss();
 
-                if (result) {
+                if (Boolean.parseBoolean(result)) {
                     if (getDataTask == null) {
                         progressDialog.show();
                         getDataTask = new GetDataTask(cookie, getDataListener);
@@ -173,7 +171,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
             }
         };
 
-        getDataListener = new GetDataListener() {
+        getDataListener = new ResponseListener() {
             @Override
             public void onCompleted(String result) {
                 getDataTask = null;
@@ -189,7 +187,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
             }
         };
 
-        loginListener = new LoginListener() {
+        loginListener = new ResponseListener() {
             @Override
             public void onCompleted(String result) {
                 authTask = null;
@@ -320,22 +318,22 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
             for (Element el : registeredElements.get(0).select("li")) {
                 registeredWeek.append(el.html());
             }
-            Integer registeredWeekInteger = Integer.parseInt(registeredWeek.toString());
-            this.registeredWeek.setText(String.format(getString(R.string.registered_week), registeredWeekInteger.toString()));
+            int registeredWeekInteger = Integer.parseInt(registeredWeek.toString());
+            this.registeredWeek.setText(String.format(getString(R.string.registered_week), registeredWeekInteger));
 
             StringBuilder registeredMonth = new StringBuilder();
             for (Element el : registeredElements.get(1).select("li")) {
                 registeredMonth.append(el.html());
             }
-            Integer registeredMonthInteger = Integer.parseInt(registeredMonth.toString());
-            this.registeredMonth.setText(String.format(getString(R.string.registered_month), registeredMonthInteger.toString()));
+            int registeredMonthInteger = Integer.parseInt(registeredMonth.toString());
+            this.registeredMonth.setText(String.format(getString(R.string.registered_month), registeredMonthInteger));
 
             StringBuilder registeredYear = new StringBuilder();
             for (Element el : registeredElements.get(2).select("li")) {
                 registeredYear.append(el.html());
             }
-            Integer registeredYearInteger = Integer.parseInt(registeredYear.toString());
-            this.registeredYear.setText(String.format(getString(R.string.registered_year), registeredYearInteger.toString()));
+            int registeredYearInteger = Integer.parseInt(registeredYear.toString());
+            this.registeredYear.setText(String.format(getString(R.string.registered_year), registeredYearInteger));
         }
         //error messages
         Elements error = doc.select("div.alert-danger");
