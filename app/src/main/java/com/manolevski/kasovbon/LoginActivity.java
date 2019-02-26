@@ -18,9 +18,9 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.manolevski.kasovbon.Listeners.LoginListener;
 import com.manolevski.kasovbon.AsyncTasks.UserLoginTask;
 import com.manolevski.kasovbon.Listeners.ErrorDialogClickListener;
+import com.manolevski.kasovbon.Listeners.ResponseListener;
 import com.manolevski.kasovbon.Managers.DialogManager;
 import com.manolevski.kasovbon.Managers.SharedPreferencesManager;
 import com.manolevski.kasovbon.Utils.User;
@@ -33,7 +33,7 @@ public class LoginActivity extends AppCompatActivity {
      */
     private UserLoginTask mAuthTask = null;
 
-    private LoginListener loginListener;
+    private ResponseListener loginListener;
 
     private SharedPreferencesManager preferences;
     private ProgressDialog progressDialog;
@@ -41,8 +41,6 @@ public class LoginActivity extends AppCompatActivity {
     private AutoCompleteTextView emailView;
     private EditText passwordView;
     private CheckBox rememberMe;
-//    private View progressView;
-//    private View loginFormView;
     private TextView registerText;
     private Button emailSignInButton;
 
@@ -84,9 +82,6 @@ public class LoginActivity extends AppCompatActivity {
         passwordView = findViewById(R.id.password);
         registerText = findViewById(R.id.register);
         emailSignInButton = findViewById(R.id.email_sign_in_button);
-
-//        loginFormView = findViewById(R.id.login_form);
-//        progressView = findViewById(R.id.login_progress);
     }
 
     private void setListeners() {
@@ -108,7 +103,7 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
-        loginListener = new LoginListener() {
+        loginListener = new ResponseListener() {
             @Override
             public void onCompleted(String result) {
                 mAuthTask = null;

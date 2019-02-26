@@ -2,7 +2,7 @@ package com.manolevski.kasovbon.AsyncTasks;
 
 import android.os.AsyncTask;
 
-import com.manolevski.kasovbon.Listeners.GetDataListener;
+import com.manolevski.kasovbon.Listeners.ResponseListener;
 import com.manolevski.kasovbon.Utils.Constants;
 
 import java.io.IOException;
@@ -15,10 +15,10 @@ import cz.msebera.android.httpclient.util.EntityUtils;
 
 public class GetDataTask extends AsyncTask<Void, Void, String> {
 
-    private GetDataListener listener;
+    private ResponseListener listener;
     private String mCookie;
 
-    public GetDataTask(String cookie, GetDataListener listener) {
+    public GetDataTask(String cookie, ResponseListener listener) {
         mCookie = cookie;
         this.listener=listener;
     }
@@ -26,7 +26,7 @@ public class GetDataTask extends AsyncTask<Void, Void, String> {
     @Override
     protected String doInBackground(Void... params) {
         HttpGet httpget = new HttpGet(Constants.BASE_URL);
-        httpget.setHeader("Cookie", "RAICHUADMSESSID="+mCookie);
+        httpget.setHeader("Cookie", "RAICHUADMSESSID=" + mCookie);
         String responseString;
 
         try (CloseableHttpClient httpClient = HttpClientBuilder.create().build()) {
