@@ -1,13 +1,19 @@
 package com.manolevski.kasovbon;
 
+import android.Manifest;
+import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
 import android.app.TimePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import android.text.TextUtils;
 import android.view.Menu;
@@ -21,6 +27,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
+import com.google.gson.Gson;
 import com.manolevski.kasovbon.AsyncTasks.GetDataTask;
 import com.manolevski.kasovbon.Listeners.ResponseListener;
 import com.manolevski.kasovbon.AsyncTasks.SendDataTask;
@@ -29,6 +36,7 @@ import com.manolevski.kasovbon.Listeners.ErrorDialogClickListener;
 import com.manolevski.kasovbon.Managers.DialogManager;
 import com.manolevski.kasovbon.Utils.Constants;
 import com.manolevski.kasovbon.Managers.SharedPreferencesManager;
+import com.manolevski.kasovbon.Utils.ScannerResult;
 import com.manolevski.kasovbon.Utils.User;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -70,6 +78,8 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
     private ResponseListener loginListener;
 
     private Calendar calendar;
+
+    static final int SCANNER_REQUEST = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -291,6 +301,59 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                 progressDialog.show();
                 sendDataTask = new SendDataTask(date, time, price, posTime, cookie, sendDataListener);
                 sendDataTask.execute((Void) null);
+            }
+        }
+    }
+
+    public void scan(View v) {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, Constants.CAMERA_PERMISSION);
+        } else {
+            Intent intent = new Intent(this, ScannerActivity.class);
+            startActivityForResult(intent, SCANNER_REQUEST);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case Constants.CAMERA_PERMISSION:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Intent intent = new Intent(this, ScannerActivity.class);
+                    startActivityForResult(intent, SCANNER_REQUEST);
+                } else {
+                    Snackbar.make(findViewById(android.R.id.content), getString(R.string.scan_permission), Snackbar.LENGTH_LONG).show();
+                }
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == SCANNER_REQUEST) {
+            if(resultCode == Activity.RESULT_OK){
+                String json = data.getStringExtra(Constants.SCANNER_RESULT);
+                if (json == null) {
+                    return;
+                }
+                Gson gson = new Gson();
+                ScannerResult scannerResult = gson.fromJson(json, ScannerResult.class);
+                if (scannerResult == null) {
+                    return;
+                }
+                if (scannerResult.getPrice() != null) {
+                    priceEdit.setText(scannerResult.getPrice());
+                }
+                if (scannerResult.getDate() != null) {
+                    SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy", Locale.GERMANY);
+                    dateEdit.setText(sdf.format(scannerResult.getDate()));
+                }
+                if (scannerResult.getTime() != null) {
+                    SimpleDateFormat sdf = new SimpleDateFormat("HH:mm", Locale.GERMANY);
+                    timeEdit.setText(sdf.format(scannerResult.getTime()));
+                }
+            }
+            if (resultCode == Activity.RESULT_CANCELED && data != null) {
+                Snackbar.make(findViewById(android.R.id.content), getString(R.string.scan_error), Snackbar.LENGTH_LONG).show();
             }
         }
     }
