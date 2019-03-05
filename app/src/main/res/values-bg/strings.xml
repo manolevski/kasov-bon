@@ -30,6 +30,12 @@
     <string name="error">Грешка</string>
     <string name="register_link"><Data><![CDATA[Ако нямате регистрация, моля регистрирайте се <a href=\"https://kasovbon.bg/\">тук</a>.]]> </Data></string>
 
+    <!--QR code scanner-->
+    <string name="scan">Сканирай</string>
+    <string name="scan_permission">Моля, дайте достъп до камерата, за да използвате QR скенера!</string>
+    <string name="scan_error">Нещо се обърка. Пробвайте отново или използвайте друг QR код.</string>
+    <string name="scan_hint">Поставете QR кода в квадрата, за да го сканирате.</string>
+
     <!--Common-->
     <string name="please_wait_message">Моля, изчакайте!</string>
 </resources>
