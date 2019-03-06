@@ -16,6 +16,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -27,7 +28,6 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
-import com.google.gson.Gson;
 import com.manolevski.kasovbon.AsyncTasks.GetDataTask;
 import com.manolevski.kasovbon.Listeners.ResponseListener;
 import com.manolevski.kasovbon.AsyncTasks.SendDataTask;
@@ -45,6 +45,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.parser.Parser;
 import org.jsoup.select.Elements;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -52,6 +53,7 @@ import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity implements DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener {
 
+    private static final String TAG = "MainActivity";
 
     private EditText dateEdit;
     private EditText timeEdit;
@@ -78,6 +80,8 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
     private ResponseListener loginListener;
 
     private Calendar calendar;
+    private SimpleDateFormat dateFormat;
+    private SimpleDateFormat timeFormat;
 
     static final int SCANNER_REQUEST = 1;
 
@@ -106,6 +110,9 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         }
 
         calendar = Calendar.getInstance();
+
+        dateFormat = new SimpleDateFormat("dd.MM.yyyy", Locale.GERMANY);
+        timeFormat = new SimpleDateFormat("HH:mm", Locale.GERMANY);
     }
 
     @Override
@@ -331,31 +338,46 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == SCANNER_REQUEST) {
             if(resultCode == Activity.RESULT_OK){
-                String json = data.getStringExtra(Constants.SCANNER_RESULT);
-                if (json == null) {
+                String result = data.getStringExtra(Constants.SCANNER_RESULT);
+                String[] resultArray = result.split("\\*");
+                ScannerResult scannerResult = null;
+                if (resultArray.length == 5) {
+                    scannerResult = new ScannerResult(resultArray[0], resultArray[1], parseDate(resultArray[2]), parseTime(resultArray[3]), resultArray[4]);
+                }
+                if (scannerResult == null || scannerResult.getPrice() == null || scannerResult.getDate() == null || scannerResult.getTime() == null) {
+                    showScannerError();
                     return;
                 }
-                Gson gson = new Gson();
-                ScannerResult scannerResult = gson.fromJson(json, ScannerResult.class);
-                if (scannerResult == null) {
-                    return;
-                }
-                if (scannerResult.getPrice() != null) {
-                    priceEdit.setText(scannerResult.getPrice());
-                }
-                if (scannerResult.getDate() != null) {
-                    SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy", Locale.GERMANY);
-                    dateEdit.setText(sdf.format(scannerResult.getDate()));
-                }
-                if (scannerResult.getTime() != null) {
-                    SimpleDateFormat sdf = new SimpleDateFormat("HH:mm", Locale.GERMANY);
-                    timeEdit.setText(sdf.format(scannerResult.getTime()));
-                }
+                dateEdit.setText(dateFormat.format(scannerResult.getDate()));
+                timeEdit.setText(timeFormat.format(scannerResult.getTime()));
+                priceEdit.setText(scannerResult.getPrice());
             }
             if (resultCode == Activity.RESULT_CANCELED && data != null) {
-                Snackbar.make(findViewById(android.R.id.content), getString(R.string.scan_error), Snackbar.LENGTH_LONG).show();
+                showScannerError();
             }
         }
+    }
+
+    private Date parseDate(String input) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.GERMANY);
+        Date convertedDate = new Date();
+        try {
+            convertedDate = dateFormat.parse(input);
+        } catch (ParseException e) {
+            Log.e(TAG, e.getMessage());
+        }
+        return convertedDate;
+    }
+
+    private Date parseTime(String input) {
+        SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss", Locale.GERMANY);
+        Date convertedTime = new Date();
+        try {
+            convertedTime = timeFormat.parse(input);
+        } catch (ParseException e) {
+            Log.e(TAG, e.getMessage());
+        }
+        return convertedTime;
     }
 
     private void parseHTML(String getDataString) {
@@ -421,6 +443,10 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         }
     }
 
+    private void showScannerError() {
+        Snackbar.make(findViewById(android.R.id.content), getString(R.string.scan_error), Snackbar.LENGTH_LONG).show();
+    }
+
     private void logInAgain() {
         progressDialog.show();
 
@@ -443,8 +469,8 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         calendar.set(Calendar.MONTH, selectedMonth);
         calendar.set(Calendar.DAY_OF_MONTH, selectedDay);
         Date selectedDate = calendar.getTime();
-        SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy", Locale.GERMANY);
-        dateEdit.setText(sdf.format(selectedDate));
+
+        dateEdit.setText(dateFormat.format(selectedDate));
     }
 
     @Override
@@ -452,7 +478,6 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         calendar.set(Calendar.HOUR_OF_DAY, selectedHour);
         calendar.set(Calendar.MINUTE, selectedMinute);
         Date selectedTime = calendar.getTime();
-        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm", Locale.GERMANY);
-        timeEdit.setText(sdf.format(selectedTime));
+        timeEdit.setText(timeFormat.format(selectedTime));
     }
 }
