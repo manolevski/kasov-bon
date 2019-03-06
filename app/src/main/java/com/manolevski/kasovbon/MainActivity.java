@@ -192,9 +192,10 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
             @Override
             public void onCompleted(String result) {
                 getDataTask = null;
-                progressDialog.dismiss();
-                if (!result.equals(""))
+                if (!result.equals("")) {
                     parseHTML(result);
+                }
+                progressDialog.dismiss();
             }
 
             @Override
