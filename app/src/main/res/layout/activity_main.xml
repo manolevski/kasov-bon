@@ -120,23 +120,11 @@
                 style="@android:style/TextAppearance.Large"
                 android:text="@string/registered_text"/>
             <TextView
-                android:id="@+id/registered_week"
+                android:id="@+id/registered_values"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 style="@android:style/TextAppearance.Medium"
-                android:text="@string/registered_week"/>
-            <TextView
-                android:id="@+id/registered_month"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                style="@android:style/TextAppearance.Medium"
-                android:text="@string/registered_month"/>
-            <TextView
-                android:id="@+id/registered_year"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                style="@android:style/TextAppearance.Medium"
-                android:text="@string/registered_year"/>
+                android:text="@string/registered_values"/>
         </LinearLayout>
     </LinearLayout>
 </ScrollView>

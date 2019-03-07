@@ -70,9 +70,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
     private ProgressDialog progressDialog;
 
     private View dataForm;
-    private TextView registeredWeek;
-    private TextView registeredMonth;
-    private TextView registeredYear;
+    private TextView registeredValues;
 
     private SharedPreferencesManager preferences;
     private ResponseListener sendDataListener;
@@ -132,10 +130,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         timePosEdit = findViewById(R.id.time_pos_edit);
 
         dataForm = findViewById(R.id.data_form);
-        registeredWeek = findViewById(R.id.registered_week);
-        registeredMonth = findViewById(R.id.registered_month);
-        registeredYear = findViewById(R.id.registered_year);
-
+        registeredValues = findViewById(R.id.registered_values);
     }
 
     private void setListeners() {
@@ -405,26 +400,21 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
             dataForm.setVisibility(View.VISIBLE);
             Elements registeredElements = section.first().select("ul");
 
-            StringBuilder registeredWeek = new StringBuilder();
-            for (Element el : registeredElements.get(0).select("li")) {
-                registeredWeek.append(el.html());
+            //We expect exactly 3 values: for weekly, monthly and annually prizes
+            if (registeredElements.size() != 3) {
+                return;
             }
-            int registeredWeekInteger = Integer.parseInt(registeredWeek.toString());
-            this.registeredWeek.setText(String.format(getString(R.string.registered_week), registeredWeekInteger));
 
-            StringBuilder registeredMonth = new StringBuilder();
-            for (Element el : registeredElements.get(1).select("li")) {
-                registeredMonth.append(el.html());
+            Integer[] registeredArray = new Integer[3];
+            for (int i = 0; i < registeredElements.size(); i++) {
+                StringBuilder builder = new StringBuilder();
+                for (Element el : registeredElements.get(i).select("li")) {
+                    builder.append(el.html());
+                }
+                registeredArray[i] = Integer.parseInt(builder.toString());
             }
-            int registeredMonthInteger = Integer.parseInt(registeredMonth.toString());
-            this.registeredMonth.setText(String.format(getString(R.string.registered_month), registeredMonthInteger));
 
-            StringBuilder registeredYear = new StringBuilder();
-            for (Element el : registeredElements.get(2).select("li")) {
-                registeredYear.append(el.html());
-            }
-            int registeredYearInteger = Integer.parseInt(registeredYear.toString());
-            this.registeredYear.setText(String.format(getString(R.string.registered_year), registeredYearInteger));
+            this.registeredValues.setText(String.format(getString(R.string.registered_values), registeredArray[0], registeredArray[1], registeredArray[2]));
         }
         //error messages
         Elements error = doc.select("div.alert-danger");
