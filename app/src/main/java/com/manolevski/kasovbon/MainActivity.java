@@ -99,16 +99,6 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         cookie = preferences.getCookie();
         user = preferences.getUser();
 
-        if (cookie.equals("")) {
-            logOut();
-        } else {
-            if (getDataTask == null) {
-                progressDialog.show();
-                getDataTask = new GetDataTask(cookie, getDataListener);
-                getDataTask.execute((Void) null);
-            }
-        }
-
         calendar = Calendar.getInstance();
 
         dateFormat = new SimpleDateFormat("dd.MM.yyyy", Locale.GERMANY);
@@ -116,11 +106,22 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+
+        if (cookie.equals("")) {
+            logOut();
+        } else {
+            getData();
+        }
+    }
+
+    @Override
     protected void onStop() {
+        super.onStop();
         if (progressDialog.isShowing()) {
             progressDialog.dismiss();
         }
-        super.onStop();
     }
 
     private void initLayout() {
@@ -214,11 +215,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                 if (!result.equals("error") && !result.equals("fail")) {
                     preferences.setCookie(result);
                     cookie = result;
-                    if (getDataTask == null) {
-                        progressDialog.show();
-                        getDataTask = new GetDataTask(cookie, getDataListener);
-                        getDataTask.execute((Void) null);
-                    }
+                    getData();
                 } else {
                     Snackbar.make(findViewById(android.R.id.content), R.string.error_common, Snackbar.LENGTH_LONG).show();
                 }
@@ -250,7 +247,15 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         }
     }
 
-    public void showDatePickerDialog() {
+    private void getData() {
+        if (getDataTask == null) {
+            progressDialog.show();
+            getDataTask = new GetDataTask(cookie, getDataListener);
+            getDataTask.execute((Void) null);
+        }
+    }
+
+    private void showDatePickerDialog() {
         dateEdit.setError(null);
 
         int year = calendar.get(Calendar.YEAR);
@@ -260,7 +265,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         DialogManager.datePickerDialog(this, year, month, day, this);
     }
 
-    public void showTimePickerDialog() {
+    private void showTimePickerDialog() {
         timeEdit.setError(null);
 
         int hour = calendar.get(Calendar.HOUR_OF_DAY);
