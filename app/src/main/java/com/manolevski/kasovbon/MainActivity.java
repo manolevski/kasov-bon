@@ -425,6 +425,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                     dialog.dismiss();
                 }
             });
+            return;
         }
 
         //Success messages
