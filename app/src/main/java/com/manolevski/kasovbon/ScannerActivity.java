@@ -6,7 +6,9 @@ import android.content.Intent;
 import android.graphics.Canvas;
 import android.os.Bundle;
 import android.util.AttributeSet;
+import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.Result;
@@ -17,7 +19,9 @@ import me.dm7.barcodescanner.core.ViewFinderView;
 import me.dm7.barcodescanner.zxing.ZXingScannerView;
 
 public class ScannerActivity extends Activity implements ZXingScannerView.ResultHandler {
-    private ZXingScannerView mScannerView;
+    private ZXingScannerView scannerView;
+    private boolean flashEnabled = false;
+    private ImageView flashButton;
 
     private static final int BORDER_RADIUS = 10;
 
@@ -26,27 +30,30 @@ public class ScannerActivity extends Activity implements ZXingScannerView.Result
         super.onCreate(state);
         setContentView(R.layout.activity_scanner);
 
+        flashButton = findViewById(R.id.flash_button);
+
         ViewGroup contentFrame = findViewById(R.id.content_frame);
-        mScannerView = new ZXingScannerView(this) {
+        scannerView = new ZXingScannerView(this) {
             @Override
             protected IViewFinder createViewFinderView(Context context) {
                 return new CustomViewFinderView(context);
             }
         };
-        contentFrame.addView(mScannerView);
+        contentFrame.addView(scannerView);
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        mScannerView.setResultHandler(this);
-        mScannerView.startCamera();
+        scannerView.setResultHandler(this);
+        scannerView.startCamera();
+        flashButton.setVisibility(View.VISIBLE);
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        mScannerView.stopCamera();
+        scannerView.stopCamera();
     }
 
     @Override
@@ -64,6 +71,12 @@ public class ScannerActivity extends Activity implements ZXingScannerView.Result
         //If something is not right.
         setResult(Activity.RESULT_CANCELED, returnIntent);
         finish();
+    }
+
+    public void toggleFlash(View v) {
+        flashEnabled = !flashEnabled;
+        flashButton.setImageDrawable(getResources().getDrawable(flashEnabled ? R.drawable.flash_on : R.drawable.flash_off));
+        scannerView.setFlash(flashEnabled);
     }
 
     private static class CustomViewFinderView extends ViewFinderView {

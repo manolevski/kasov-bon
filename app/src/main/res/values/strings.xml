@@ -36,6 +36,7 @@
     <string name="scan_permission">Please grant camera permission to use the QR Scanner!</string>
     <string name="scan_error">Something went wrong. Try again or use different QR code.</string>
     <string name="scan_hint">Place a QR code in the rectangle to scan it.</string>
+    <string name="flash_description">Toggle flash</string>
 
     <!--Common-->
     <string name="please_wait_message">Please wait!</string>

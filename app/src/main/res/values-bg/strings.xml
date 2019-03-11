@@ -33,6 +33,7 @@
     <string name="scan_permission">Моля, дайте достъп до камерата, за да използвате QR скенера!</string>
     <string name="scan_error">Нещо се обърка. Пробвайте отново или използвайте друг QR код.</string>
     <string name="scan_hint">Поставете QR кода в квадрата, за да го сканирате.</string>
+    <string name="flash_description">Превключи светкавицата</string>
 
     <!--Common-->
     <string name="please_wait_message">Моля, изчакайте!</string>
