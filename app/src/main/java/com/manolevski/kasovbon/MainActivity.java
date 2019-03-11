@@ -1,15 +1,22 @@
 package com.manolevski.kasovbon;
 
+import android.Manifest;
+import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
 import android.app.TimePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -22,15 +29,14 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 
 import com.manolevski.kasovbon.AsyncTasks.GetDataTask;
-import com.manolevski.kasovbon.Listeners.GetDataListener;
-import com.manolevski.kasovbon.Listeners.LoginListener;
-import com.manolevski.kasovbon.Listeners.SendDataListener;
+import com.manolevski.kasovbon.Listeners.ResponseListener;
 import com.manolevski.kasovbon.AsyncTasks.SendDataTask;
 import com.manolevski.kasovbon.AsyncTasks.UserLoginTask;
 import com.manolevski.kasovbon.Listeners.ErrorDialogClickListener;
 import com.manolevski.kasovbon.Managers.DialogManager;
 import com.manolevski.kasovbon.Utils.Constants;
 import com.manolevski.kasovbon.Managers.SharedPreferencesManager;
+import com.manolevski.kasovbon.Utils.ScannerResult;
 import com.manolevski.kasovbon.Utils.User;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -39,6 +45,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.parser.Parser;
 import org.jsoup.select.Elements;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -46,6 +53,7 @@ import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity implements DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener {
 
+    private static final String TAG = "MainActivity";
 
     private EditText dateEdit;
     private EditText timeEdit;
@@ -62,16 +70,18 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
     private ProgressDialog progressDialog;
 
     private View dataForm;
-    private TextView registeredWeek;
-    private TextView registeredMonth;
-    private TextView registeredYear;
+    private TextView registeredValues;
 
     private SharedPreferencesManager preferences;
-    private SendDataListener sendDataListener;
-    private GetDataListener getDataListener;
-    private LoginListener loginListener;
+    private ResponseListener sendDataListener;
+    private ResponseListener getDataListener;
+    private ResponseListener loginListener;
 
     private Calendar calendar;
+    private SimpleDateFormat dateFormat;
+    private SimpleDateFormat timeFormat;
+
+    static final int SCANNER_REQUEST = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,25 +97,29 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         cookie = preferences.getCookie();
         user = preferences.getUser();
 
+        calendar = Calendar.getInstance();
+
+        dateFormat = new SimpleDateFormat("dd.MM.yyyy", Locale.GERMANY);
+        timeFormat = new SimpleDateFormat("HH:mm", Locale.GERMANY);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
         if (cookie.equals("")) {
             logOut();
         } else {
-            if (getDataTask == null) {
-                progressDialog.show();
-                getDataTask = new GetDataTask(cookie, getDataListener);
-                getDataTask.execute((Void) null);
-            }
+            getData();
         }
-
-        calendar = Calendar.getInstance();
     }
 
     @Override
     protected void onStop() {
+        super.onStop();
         if (progressDialog.isShowing()) {
             progressDialog.dismiss();
         }
-        super.onStop();
     }
 
     private void initLayout() {
@@ -116,10 +130,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         timePosEdit = findViewById(R.id.time_pos_edit);
 
         dataForm = findViewById(R.id.data_form);
-        registeredWeek = findViewById(R.id.registered_week);
-        registeredMonth = findViewById(R.id.registered_month);
-        registeredYear = findViewById(R.id.registered_year);
-
+        registeredValues = findViewById(R.id.registered_values);
     }
 
     private void setListeners() {
@@ -149,13 +160,13 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
             }
         });
 
-        sendDataListener = new SendDataListener() {
+        sendDataListener = new ResponseListener() {
             @Override
-            public void onCompleted(Boolean result) {
+            public void onCompleted(String result) {
                 sendDataTask = null;
                 progressDialog.dismiss();
 
-                if (result) {
+                if (Boolean.parseBoolean(result)) {
                     if (getDataTask == null) {
                         progressDialog.show();
                         getDataTask = new GetDataTask(cookie, getDataListener);
@@ -173,13 +184,14 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
             }
         };
 
-        getDataListener = new GetDataListener() {
+        getDataListener = new ResponseListener() {
             @Override
             public void onCompleted(String result) {
                 getDataTask = null;
-                progressDialog.dismiss();
-                if (!result.equals(""))
+                if (!result.equals("")) {
                     parseHTML(result);
+                }
+                progressDialog.dismiss();
             }
 
             @Override
@@ -189,7 +201,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
             }
         };
 
-        loginListener = new LoginListener() {
+        loginListener = new ResponseListener() {
             @Override
             public void onCompleted(String result) {
                 authTask = null;
@@ -198,11 +210,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                 if (!result.equals("error") && !result.equals("fail")) {
                     preferences.setCookie(result);
                     cookie = result;
-                    if (getDataTask == null) {
-                        progressDialog.show();
-                        getDataTask = new GetDataTask(cookie, getDataListener);
-                        getDataTask.execute((Void) null);
-                    }
+                    getData();
                 } else {
                     Snackbar.make(findViewById(android.R.id.content), R.string.error_common, Snackbar.LENGTH_LONG).show();
                 }
@@ -234,7 +242,15 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         }
     }
 
-    public void showDatePickerDialog() {
+    private void getData() {
+        if (getDataTask == null) {
+            progressDialog.show();
+            getDataTask = new GetDataTask(cookie, getDataListener);
+            getDataTask.execute((Void) null);
+        }
+    }
+
+    private void showDatePickerDialog() {
         dateEdit.setError(null);
 
         int year = calendar.get(Calendar.YEAR);
@@ -244,7 +260,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         DialogManager.datePickerDialog(this, year, month, day, this);
     }
 
-    public void showTimePickerDialog() {
+    private void showTimePickerDialog() {
         timeEdit.setError(null);
 
         int hour = calendar.get(Calendar.HOUR_OF_DAY);
@@ -297,6 +313,74 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         }
     }
 
+    public void scan(View v) {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, Constants.CAMERA_PERMISSION);
+        } else {
+            Intent intent = new Intent(this, ScannerActivity.class);
+            startActivityForResult(intent, SCANNER_REQUEST);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case Constants.CAMERA_PERMISSION:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Intent intent = new Intent(this, ScannerActivity.class);
+                    startActivityForResult(intent, SCANNER_REQUEST);
+                } else {
+                    Snackbar.make(findViewById(android.R.id.content), getString(R.string.scan_permission), Snackbar.LENGTH_LONG).show();
+                }
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == SCANNER_REQUEST) {
+            if(resultCode == Activity.RESULT_OK){
+                String result = data.getStringExtra(Constants.SCANNER_RESULT);
+                String[] resultArray = result.split("\\*");
+                ScannerResult scannerResult = null;
+                if (resultArray.length == 5) {
+                    scannerResult = new ScannerResult(resultArray[0], resultArray[1], parseDate(resultArray[2]), parseTime(resultArray[3]), resultArray[4]);
+                }
+                if (scannerResult == null || scannerResult.getPrice() == null || scannerResult.getDate() == null || scannerResult.getTime() == null) {
+                    showScannerError();
+                    return;
+                }
+                dateEdit.setText(dateFormat.format(scannerResult.getDate()));
+                timeEdit.setText(timeFormat.format(scannerResult.getTime()));
+                priceEdit.setText(scannerResult.getPrice());
+            }
+            if (resultCode == Activity.RESULT_CANCELED && data != null) {
+                showScannerError();
+            }
+        }
+    }
+
+    private Date parseDate(String input) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.GERMANY);
+        Date convertedDate = new Date();
+        try {
+            convertedDate = dateFormat.parse(input);
+        } catch (ParseException e) {
+            Log.e(TAG, e.getMessage());
+        }
+        return convertedDate;
+    }
+
+    private Date parseTime(String input) {
+        SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss", Locale.GERMANY);
+        Date convertedTime = new Date();
+        try {
+            convertedTime = timeFormat.parse(input);
+        } catch (ParseException e) {
+            Log.e(TAG, e.getMessage());
+        }
+        return convertedTime;
+    }
+
     private void parseHTML(String getDataString) {
         if (getDataString.isEmpty())
             return;
@@ -316,26 +400,21 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
             dataForm.setVisibility(View.VISIBLE);
             Elements registeredElements = section.first().select("ul");
 
-            StringBuilder registeredWeek = new StringBuilder();
-            for (Element el : registeredElements.get(0).select("li")) {
-                registeredWeek.append(el.html());
+            //We expect exactly 3 values: for weekly, monthly and annually prizes
+            if (registeredElements.size() != 3) {
+                return;
             }
-            Integer registeredWeekInteger = Integer.parseInt(registeredWeek.toString());
-            this.registeredWeek.setText(String.format(getString(R.string.registered_week), registeredWeekInteger.toString()));
 
-            StringBuilder registeredMonth = new StringBuilder();
-            for (Element el : registeredElements.get(1).select("li")) {
-                registeredMonth.append(el.html());
+            Integer[] registeredArray = new Integer[3];
+            for (int i = 0; i < registeredElements.size(); i++) {
+                StringBuilder builder = new StringBuilder();
+                for (Element el : registeredElements.get(i).select("li")) {
+                    builder.append(el.html());
+                }
+                registeredArray[i] = Integer.parseInt(builder.toString());
             }
-            Integer registeredMonthInteger = Integer.parseInt(registeredMonth.toString());
-            this.registeredMonth.setText(String.format(getString(R.string.registered_month), registeredMonthInteger.toString()));
 
-            StringBuilder registeredYear = new StringBuilder();
-            for (Element el : registeredElements.get(2).select("li")) {
-                registeredYear.append(el.html());
-            }
-            Integer registeredYearInteger = Integer.parseInt(registeredYear.toString());
-            this.registeredYear.setText(String.format(getString(R.string.registered_year), registeredYearInteger.toString()));
+            this.registeredValues.setText(String.format(getString(R.string.registered_values), registeredArray[0], registeredArray[1], registeredArray[2]));
         }
         //error messages
         Elements error = doc.select("div.alert-danger");
@@ -346,17 +425,23 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                     dialog.dismiss();
                 }
             });
+            return;
         }
 
         //Success messages
         Elements success = doc.select("div.alert-success");
         if (success.size() > 0 && !success.first().html().equals("")) {
             priceEdit.setText("");
+            priceEdit.requestFocus();
             timeEdit.setText("");
             timePosEdit.setText("");
             posCheckBox.setChecked(false);
             Snackbar.make(findViewById(android.R.id.content), success.first().html().replaceAll("<br />", ""), Snackbar.LENGTH_LONG).show();
         }
+    }
+
+    private void showScannerError() {
+        Snackbar.make(findViewById(android.R.id.content), getString(R.string.scan_error), Snackbar.LENGTH_LONG).show();
     }
 
     private void logInAgain() {
@@ -381,8 +466,8 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         calendar.set(Calendar.MONTH, selectedMonth);
         calendar.set(Calendar.DAY_OF_MONTH, selectedDay);
         Date selectedDate = calendar.getTime();
-        SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy", Locale.GERMANY);
-        dateEdit.setText(sdf.format(selectedDate));
+
+        dateEdit.setText(dateFormat.format(selectedDate));
     }
 
     @Override
@@ -390,7 +475,6 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         calendar.set(Calendar.HOUR_OF_DAY, selectedHour);
         calendar.set(Calendar.MINUTE, selectedMinute);
         Date selectedTime = calendar.getTime();
-        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm", Locale.GERMANY);
-        timeEdit.setText(sdf.format(selectedTime));
+        timeEdit.setText(timeFormat.format(selectedTime));
     }
 }

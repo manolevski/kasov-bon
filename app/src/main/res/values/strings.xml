@@ -25,13 +25,18 @@
     <string name="send_success">Receipt registered.</string>
     <string name="send_fail">Receipt not registered. No connection with https://kasovbon.bg</string>
     <string name="registered_text">Registered receipts</string>
-    <string name="registered_week">For weekly prize: %1$s</string>
-    <string name="registered_month">For monthly prize: %1$s</string>
-    <string name="registered_year">For annual prize: %1$s</string>
+    <string name="registered_values">For weekly prize: %1$d\nFor monthly prize: %2$d\nFor annual prize: %3$d</string>
     <string name="attention">Attention</string>
     <string name="error">Error</string>
     <string name="empty_field">There is empty field</string>
     <string name="pos_terminal">POS terminal</string>
+
+    <!--QR code scanner-->
+    <string name="scan">Scan</string>
+    <string name="scan_permission">Please grant camera permission to use the QR Scanner!</string>
+    <string name="scan_error">Something went wrong. Try again or use different QR code.</string>
+    <string name="scan_hint">Place a QR code in the rectangle to scan it.</string>
+    <string name="flash_description">Toggle flash</string>
 
     <!--Common-->
     <string name="please_wait_message">Please wait!</string>
