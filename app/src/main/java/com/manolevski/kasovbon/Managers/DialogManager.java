@@ -9,6 +9,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 
 import com.manolevski.kasovbon.Listeners.ErrorDialogClickListener;
+import com.manolevski.kasovbon.Listeners.ReviewDialogListener;
+import com.manolevski.kasovbon.R;
 
 /**
  * Created by Anastas Manolevski on 27.11.2018.
@@ -30,6 +32,25 @@ public class DialogManager {
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         listener.onDismiss(dialog);
+                    }
+                });
+        alertDialog.show();
+    }
+
+    public static void reviewDialog(Activity activity, String title, String message, final ReviewDialogListener listener) {
+        AlertDialog alertDialog = new AlertDialog.Builder(activity).create();
+        alertDialog.setTitle(title);
+        alertDialog.setMessage(message);
+        alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, activity.getString(R.string.no),
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        listener.onDismiss(dialog);
+                    }
+                });
+        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, activity.getString(R.string.yes),
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        listener.onAccept(dialog);
                     }
                 });
         alertDialog.show();

@@ -10,6 +10,8 @@ public class SharedPreferencesManager {
     private static final String SHARED_PREFERENCES_NAME = "com.manolevski.kasovbon.preferences";
     private static final String KEY_USER_NAME = "userName";
     private static final String KEY_PASSWORD = "password";
+    private static final String KEY_REGISTERED_COUNT = "registered_count";
+    private static final String KEY_REVIEW_SHOWN = "review_shown";
     private static final String KEY_REMEMBER_ME = "rememberMe";
     private static final String KEY_COOKIE = "cookie"; //RAICHUADMSESSID
 
@@ -43,5 +45,25 @@ public class SharedPreferencesManager {
 
     public String getCookie() {
         return sharedPreferences.getString(KEY_COOKIE, "");
+    }
+
+    public void setRegisteredCount(int count) {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putInt(KEY_REGISTERED_COUNT, count);
+        editor.apply();
+    }
+
+    public int getRegisteredCount() {
+        return sharedPreferences.getInt(KEY_REGISTERED_COUNT, 0);
+    }
+
+    public void setReviewShown(boolean shown) {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putBoolean(KEY_REVIEW_SHOWN, shown);
+        editor.apply();
+    }
+
+    public boolean getReviewShown() {
+        return sharedPreferences.getBoolean(KEY_REVIEW_SHOWN, false);
     }
 }

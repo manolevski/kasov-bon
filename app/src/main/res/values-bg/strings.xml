@@ -27,6 +27,10 @@
     <string name="pos_terminal">ПОС терминал</string>
     <string name="error">Грешка</string>
     <string name="register_link"><Data><![CDATA[Ако нямате регистрация, моля регистрирайте се <a href=\"https://kasovbon.bg/\">тук</a>.]]> </Data></string>
+    <string name="yes">Да</string>
+    <string name="no">Не</string>
+    <string name="review_title">Оценете ни</string>
+    <string name="review_text">Бихте ли отделили няколко секунди, за да дадете оценка на Касов Бон?</string>
 
     <!--QR code scanner-->
     <string name="scan">Сканирай</string>

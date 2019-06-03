@@ -8,6 +8,8 @@ import android.app.TimePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
+import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -33,6 +35,7 @@ import com.manolevski.kasovbon.Listeners.ResponseListener;
 import com.manolevski.kasovbon.AsyncTasks.SendDataTask;
 import com.manolevski.kasovbon.AsyncTasks.UserLoginTask;
 import com.manolevski.kasovbon.Listeners.ErrorDialogClickListener;
+import com.manolevski.kasovbon.Listeners.ReviewDialogListener;
 import com.manolevski.kasovbon.Managers.DialogManager;
 import com.manolevski.kasovbon.Utils.Constants;
 import com.manolevski.kasovbon.Managers.SharedPreferencesManager;
@@ -49,6 +52,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity implements DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener {
@@ -166,6 +170,14 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                 sendDataTask = null;
                 progressDialog.dismiss();
 
+                if (!preferences.getReviewShown()) {
+                    preferences.setRegisteredCount(preferences.getRegisteredCount() + 1);
+                    if (preferences.getRegisteredCount() == Constants.REVIEW_THRESHOLD) {
+                        preferences.setReviewShown(true);
+                        callReviewDialog();
+                    }
+                }
+
                 if (Boolean.parseBoolean(result)) {
                     if (getDataTask == null) {
                         progressDialog.show();
@@ -248,6 +260,37 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
             getDataTask = new GetDataTask(cookie, getDataListener);
             getDataTask.execute((Void) null);
         }
+    }
+
+    private void callReviewDialog() {
+        DialogManager.reviewDialog(this, getResources().getString(R.string.review_title), getResources().getString(R.string.review_text), new ReviewDialogListener() {
+            @Override
+            public void onAccept(DialogInterface dialog) {
+                openGooglePlay();
+                dialog.dismiss();
+            }
+
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+                dialog.dismiss();
+            }
+        });
+    }
+
+    private void openGooglePlay() {
+        Uri playStoreUri = Uri.parse(Constants.PLAY_STORE_URL);
+        Intent webIntent = new Intent(Intent.ACTION_VIEW, playStoreUri);
+
+        // Verify it resolves
+        PackageManager packageManager = getPackageManager();
+        List<ResolveInfo> activities = packageManager.queryIntentActivities(webIntent, 0);
+        boolean isIntentSafe = activities.size() > 0;
+
+        // Start an activity if it's safe
+        if (isIntentSafe) {
+            startActivity(webIntent);
+        }
+
     }
 
     private void showDatePickerDialog() {
