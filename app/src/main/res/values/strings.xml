@@ -30,6 +30,10 @@
     <string name="error">Error</string>
     <string name="empty_field">There is empty field</string>
     <string name="pos_terminal">POS terminal</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="review_title">Review us</string>
+    <string name="review_text">Could you spare a few seconds and review the Kasov Bon app?</string>
 
     <!--QR code scanner-->
     <string name="scan">Scan</string>
