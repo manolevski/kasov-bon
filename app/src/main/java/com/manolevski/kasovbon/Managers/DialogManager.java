@@ -6,7 +6,6 @@ import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 
 import com.manolevski.kasovbon.Listeners.ErrorDialogClickListener;
 import com.manolevski.kasovbon.Listeners.ReviewDialogListener;
@@ -28,12 +27,7 @@ public class DialogManager {
         AlertDialog alertDialog = new AlertDialog.Builder(activity).create();
         alertDialog.setTitle(title);
         alertDialog.setMessage(message);
-        alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, activity.getString(android.R.string.ok),
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        listener.onDismiss(dialog);
-                    }
-                });
+        alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, activity.getString(android.R.string.ok), (dialog, which) -> listener.onDismiss(dialog));
         alertDialog.show();
     }
 
@@ -41,18 +35,8 @@ public class DialogManager {
         AlertDialog alertDialog = new AlertDialog.Builder(activity).create();
         alertDialog.setTitle(title);
         alertDialog.setMessage(message);
-        alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, activity.getString(R.string.no),
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        listener.onDismiss(dialog);
-                    }
-                });
-        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, activity.getString(R.string.yes),
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        listener.onAccept(dialog);
-                    }
-                });
+        alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, activity.getString(R.string.no), (dialog, which) -> listener.onDismiss(dialog));
+        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, activity.getString(R.string.yes), (dialog, which) -> listener.onAccept(dialog));
         alertDialog.show();
     }
 

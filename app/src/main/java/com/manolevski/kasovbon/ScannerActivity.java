@@ -7,12 +7,13 @@ import android.graphics.Canvas;
 import android.os.Bundle;
 import android.util.AttributeSet;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ImageView;
+
+import androidx.databinding.DataBindingUtil;
 
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.Result;
 import com.manolevski.kasovbon.Utils.Constants;
+import com.manolevski.kasovbon.databinding.ActivityScannerBinding;
 
 import me.dm7.barcodescanner.core.IViewFinder;
 import me.dm7.barcodescanner.core.ViewFinderView;
@@ -21,25 +22,22 @@ import me.dm7.barcodescanner.zxing.ZXingScannerView;
 public class ScannerActivity extends Activity implements ZXingScannerView.ResultHandler {
     private ZXingScannerView scannerView;
     private boolean flashEnabled = false;
-    private ImageView flashButton;
+    private ActivityScannerBinding binding;
 
     private static final int BORDER_RADIUS = 10;
 
     @Override
     public void onCreate(Bundle state) {
         super.onCreate(state);
-        setContentView(R.layout.activity_scanner);
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_scanner);
 
-        flashButton = findViewById(R.id.flash_button);
-
-        ViewGroup contentFrame = findViewById(R.id.content_frame);
         scannerView = new ZXingScannerView(this) {
             @Override
             protected IViewFinder createViewFinderView(Context context) {
                 return new CustomViewFinderView(context);
             }
         };
-        contentFrame.addView(scannerView);
+        binding.contentFrame.addView(scannerView);
     }
 
     @Override
@@ -47,7 +45,7 @@ public class ScannerActivity extends Activity implements ZXingScannerView.Result
         super.onResume();
         scannerView.setResultHandler(this);
         scannerView.startCamera();
-        flashButton.setVisibility(View.VISIBLE);
+        binding.flashImage.setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -75,7 +73,7 @@ public class ScannerActivity extends Activity implements ZXingScannerView.Result
 
     public void toggleFlash(View v) {
         flashEnabled = !flashEnabled;
-        flashButton.setImageDrawable(getResources().getDrawable(flashEnabled ? R.drawable.flash_on : R.drawable.flash_off));
+        binding.flashImage.setImageDrawable(getResources().getDrawable(flashEnabled ? R.drawable.flash_on : R.drawable.flash_off));
         scannerView.setFlash(flashEnabled);
     }
 

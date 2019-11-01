@@ -11,37 +11,33 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.net.Uri;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.DatePicker;
-import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.TimePicker;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.databinding.DataBindingUtil;
+
+import com.google.android.material.snackbar.Snackbar;
 import com.manolevski.kasovbon.AsyncTasks.GetDataTask;
-import com.manolevski.kasovbon.Listeners.ResponseListener;
 import com.manolevski.kasovbon.AsyncTasks.SendDataTask;
 import com.manolevski.kasovbon.AsyncTasks.UserLoginTask;
-import com.manolevski.kasovbon.Listeners.ErrorDialogClickListener;
+import com.manolevski.kasovbon.Listeners.ResponseListener;
 import com.manolevski.kasovbon.Listeners.ReviewDialogListener;
 import com.manolevski.kasovbon.Managers.DialogManager;
-import com.manolevski.kasovbon.Utils.Constants;
 import com.manolevski.kasovbon.Managers.SharedPreferencesManager;
+import com.manolevski.kasovbon.Utils.Constants;
 import com.manolevski.kasovbon.Utils.ScannerResult;
 import com.manolevski.kasovbon.Utils.User;
-import com.google.android.material.snackbar.Snackbar;
+import com.manolevski.kasovbon.databinding.ActivityMainBinding;
 
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -59,22 +55,16 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
 
     private static final String TAG = "MainActivity";
 
-    private EditText dateEdit;
-    private EditText timeEdit;
-    private EditText priceEdit;
-    private EditText timePosEdit;
-    private CheckBox posCheckBox;
     private String cookie;
     private User user;
+
+    private ActivityMainBinding binding;
 
     private SendDataTask sendDataTask = null;
     private GetDataTask getDataTask = null;
     private UserLoginTask authTask = null;
 
     private ProgressDialog progressDialog;
-
-    private View dataForm;
-    private TextView registeredValues;
 
     private SharedPreferencesManager preferences;
     private ResponseListener sendDataListener;
@@ -90,9 +80,8 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
 
-        initLayout();
         setListeners();
 
         progressDialog = DialogManager.initProgressDialog(this, getString(R.string.please_wait_message), false);
@@ -126,42 +115,22 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         }
     }
 
-    private void initLayout() {
-        dateEdit = findViewById(R.id.date_edit);
-        timeEdit = findViewById(R.id.time_edit);
-        priceEdit = findViewById(R.id.price_edit);
-        posCheckBox = findViewById(R.id.pos_check);
-        timePosEdit = findViewById(R.id.time_pos_edit);
-
-        dataForm = findViewById(R.id.data_form);
-        registeredValues = findViewById(R.id.registered_values);
-    }
-
     private void setListeners() {
-        dateEdit.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if (hasFocus) {
-                    showDatePickerDialog();
-                }
+        binding.dateEdit.setOnFocusChangeListener((v, hasFocus) -> {
+            if (hasFocus) {
+                showDatePickerDialog();
             }
         });
 
-        timeEdit.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if (hasFocus) {
-                    showTimePickerDialog();
-                }
+        binding.timeEdit.setOnFocusChangeListener((v, hasFocus) -> {
+            if (hasFocus) {
+                showTimePickerDialog();
             }
         });
 
-        posCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean checked) {
-                timePosEdit.setEnabled(checked);
-                timePosEdit.setText(checked ? timeEdit.getText().toString() : "");
-            }
+        binding.posCheck.setOnCheckedChangeListener((compoundButton, checked) -> {
+            binding.timePosEdit.setEnabled(checked);
+            binding.timePosEdit.setText(checked ? binding.timeEdit.getText().toString() : "");
         });
 
         sendDataListener = new ResponseListener() {
@@ -294,7 +263,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
     }
 
     private void showDatePickerDialog() {
-        dateEdit.setError(null);
+        binding.dateEdit.setError(null);
 
         int year = calendar.get(Calendar.YEAR);
         int month = calendar.get(Calendar.MONTH);
@@ -304,7 +273,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
     }
 
     private void showTimePickerDialog() {
-        timeEdit.setError(null);
+        binding.timeEdit.setError(null);
 
         int hour = calendar.get(Calendar.HOUR_OF_DAY);
         int minute = calendar.get(Calendar.MINUTE);
@@ -314,34 +283,34 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
 
     public void sendData(View v) {
         // Reset errors.
-        timeEdit.setError(null);
-        priceEdit.setError(null);
-        dateEdit.setError(null);
+        binding.timeEdit.setError(null);
+        binding.priceEdit.setError(null);
+        binding.dateEdit.setError(null);
 
-        String time = timeEdit.getText().toString();
-        String posTime = timePosEdit.getText().toString();
-        String price = priceEdit.getText().toString();
-        String date = dateEdit.getText().toString();
+        String time = binding.timeEdit.getText().toString();
+        String posTime = binding.timePosEdit.getText().toString();
+        String price = binding.priceEdit.getText().toString();
+        String date = binding.dateEdit.getText().toString();
         boolean cancel = false;
         View focusView = null;
         if (TextUtils.isEmpty(time)) {
-            timeEdit.setError(getString(R.string.error_field_required));
-            focusView = timeEdit;
+            binding.timeEdit.setError(getString(R.string.error_field_required));
+            focusView = binding.timeEdit;
             cancel = true;
         }
         if (TextUtils.isEmpty(date)) {
-            dateEdit.setError(getString(R.string.error_field_required));
-            focusView = dateEdit;
+            binding.dateEdit.setError(getString(R.string.error_field_required));
+            focusView = binding.dateEdit;
             cancel = true;
         }
         if (TextUtils.isEmpty(price)) {
-            priceEdit.setError(getString(R.string.error_field_required));
-            focusView = priceEdit;
+            binding.priceEdit.setError(getString(R.string.error_field_required));
+            focusView = binding.priceEdit;
             cancel = true;
         }
-        if (TextUtils.isEmpty(posTime) && posCheckBox.isChecked()) {
-            timePosEdit.setError(getString(R.string.error_field_required));
-            focusView = timePosEdit;
+        if (TextUtils.isEmpty(posTime) && binding.posCheck.isChecked()) {
+            binding.timePosEdit.setError(getString(R.string.error_field_required));
+            focusView = binding.timePosEdit;
             cancel = true;
         }
 
@@ -380,6 +349,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == SCANNER_REQUEST) {
             if(resultCode == Activity.RESULT_OK){
                 String result = data.getStringExtra(Constants.SCANNER_RESULT);
@@ -392,9 +362,9 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                     showScannerError();
                     return;
                 }
-                dateEdit.setText(dateFormat.format(scannerResult.getDate()));
-                timeEdit.setText(timeFormat.format(scannerResult.getTime()));
-                priceEdit.setText(scannerResult.getPrice());
+                binding.dateEdit.setText(dateFormat.format(scannerResult.getDate()));
+                binding.timeEdit.setText(timeFormat.format(scannerResult.getTime()));
+                binding.priceEdit.setText(scannerResult.getPrice());
             }
             if (resultCode == Activity.RESULT_CANCELED && data != null) {
                 showScannerError();
@@ -440,7 +410,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
             setTitle(section.first().select("strong").first().html());
 
             //set registered values
-            dataForm.setVisibility(View.VISIBLE);
+            binding.dataForm.setVisibility(View.VISIBLE);
             Elements registeredElements = section.first().select("ul");
 
             //We expect exactly 3 values: for weekly, monthly and annually prizes
@@ -457,28 +427,23 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                 registeredArray[i] = Integer.parseInt(builder.toString());
             }
 
-            this.registeredValues.setText(String.format(getString(R.string.registered_values), registeredArray[0], registeredArray[1], registeredArray[2]));
+            binding.registeredValues.setText(String.format(getString(R.string.registered_values), registeredArray[0], registeredArray[1], registeredArray[2]));
         }
         //error messages
         Elements error = doc.select("div.alert-danger");
         if (error.size() > 0) {
-            DialogManager.errorDialog(this, getString(R.string.error), error.first().html(), new ErrorDialogClickListener() {
-                @Override
-                public void onDismiss(DialogInterface dialog) {
-                    dialog.dismiss();
-                }
-            });
+            DialogManager.errorDialog(this, getString(R.string.error), error.first().html(), DialogInterface::dismiss);
             return;
         }
 
         //Success messages
         Elements success = doc.select("div.alert-success");
         if (success.size() > 0 && !success.first().html().equals("")) {
-            priceEdit.setText("");
-            priceEdit.requestFocus();
-            timeEdit.setText("");
-            timePosEdit.setText("");
-            posCheckBox.setChecked(false);
+            binding.priceEdit.setText("");
+            binding.priceEdit.requestFocus();
+            binding.timeEdit.setText("");
+            binding.timePosEdit.setText("");
+            binding.posCheck.setChecked(false);
             Snackbar.make(findViewById(android.R.id.content), success.first().html().replaceAll("<br />", ""), Snackbar.LENGTH_LONG).show();
         }
     }
@@ -509,8 +474,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         calendar.set(Calendar.MONTH, selectedMonth);
         calendar.set(Calendar.DAY_OF_MONTH, selectedDay);
         Date selectedDate = calendar.getTime();
-
-        dateEdit.setText(dateFormat.format(selectedDate));
+        binding.dateEdit.setText(dateFormat.format(selectedDate));
     }
 
     @Override
@@ -518,6 +482,6 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         calendar.set(Calendar.HOUR_OF_DAY, selectedHour);
         calendar.set(Calendar.MINUTE, selectedMinute);
         Date selectedTime = calendar.getTime();
-        timeEdit.setText(timeFormat.format(selectedTime));
+        binding.timeEdit.setText(timeFormat.format(selectedTime));
     }
 }
